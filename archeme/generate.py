@@ -49,9 +49,10 @@ class GenerateGraphvizSource():
         return serialized_params
 
     def _merge_element_params(self, element_type: str, element_params: dict, dsl_full_scheme: dict) -> dict:
+
         def _csv_to_list(data: list or str) -> list:
             if isinstance(data, str):
-                data = re.sub(r'\,\S*', r'\, ', data, flags=re.MULTILINE)
+                data = re.sub(r'\,\s*', ', ', data, flags=re.MULTILINE)
                 data: list = data.split(', ')
 
             return data
