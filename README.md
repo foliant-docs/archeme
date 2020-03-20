@@ -6,7 +6,7 @@ Work in progress.
 
 ### 1. Foliant Architecture, Simple, Drawn With Neato
 
-![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/01_foliant_architecture_simple/target/architecture.png
+![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/01_foliant_architecture_simple/target/architecture.png)
 
 ### 2. Foliant Architecture, Pretty, Drawn With Neato
 
