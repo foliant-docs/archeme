@@ -48,22 +48,21 @@ class GenerateGraphvizSource():
 
         return serialized_params
 
+    def _csv_to_list(self, data: list or str) -> list:
+        if isinstance(data, str):
+            data = re.sub(r'\,\s*', ', ', data, flags=re.MULTILINE)
+            data: list = data.split(', ')
+
+        return data
+
+    def _list_to_csv(self, data: str or list) -> str:
+        if isinstance(data, list):
+            data: str = ', '.join(data)
+
+        return data
+
     def _merge_element_params(self, element_type: str, element_params: dict, dsl_full_scheme: dict) -> dict:
-
-        def _csv_to_list(data: list or str) -> list:
-            if isinstance(data, str):
-                data = re.sub(r'\,\s*', ', ', data, flags=re.MULTILINE)
-                data: list = data.split(', ')
-
-            return data
-
-        def _list_to_csv(data: str or list) -> str:
-            if isinstance(data, list):
-                data: str = ', '.join(data)
-
-            return data
-
-        element_styles: list = _csv_to_list(element_params.pop('style', []))
+        element_styles: list = self._csv_to_list(element_params.pop('style', []))
         element_classes: list or str = element_params.pop('class', [])
 
         if not isinstance(element_classes, list):
@@ -76,17 +75,22 @@ class GenerateGraphvizSource():
         class_name: str
         for class_name in element_classes:
             class_params: dict = element_type_classes.get(class_name, {})
-            element_styles.extend(_csv_to_list(class_params.get('style', [])))
+            element_styles.extend(self._csv_to_list(class_params.get('style', [])))
             merged_classes_params.update(class_params)
 
         element_styles = sorted(list(set(element_styles)))
 
         if element_styles:
-            element_params.update({'style': _list_to_csv(element_styles)})
+            element_params.update({'style': self._list_to_csv(element_styles)})
 
         merged_element_params = {**merged_classes_params, **element_params}
 
         if element_type == 'cluster':
+            element_type_styles: list or str = element_type_params.pop('style', [])
+
+            if element_type_styles:
+                element_type_params['style'] = self._list_to_csv(self._csv_to_list(element_type_styles))
+
             merged_element_params = {**element_type_params, **merged_element_params}
 
         return merged_element_params
@@ -231,6 +235,12 @@ class GenerateGraphvizSource():
 
             if element_type_params:
                 element_type_params.pop('classes', None)
+
+                element_type_styles: list or str = element_type_params.pop('style', [])
+
+                if element_type_styles:
+                    element_type_params['style'] = self._list_to_csv(self._csv_to_list(element_type_styles))
+
                 dsl_to_gv_intermediate[element_type] = element_type_params
 
         def _append_positions(nodes: OrderedDict) -> OrderedDict:

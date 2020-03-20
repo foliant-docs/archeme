@@ -71,5 +71,3 @@ def entry_point():
 
     with open(output_file_path, 'w', encoding='utf8') as output_file:
         output_file.write(output)
-
-entry_point()
