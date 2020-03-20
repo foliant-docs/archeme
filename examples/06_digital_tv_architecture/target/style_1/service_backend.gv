@@ -1,0 +1,73 @@
+digraph {
+graph [newrank = "true", rankdir = "LR", splines = "true", fontname = "PT Sans Caption", fontsize = "16"];
+node [fixedsize = "true", fontname = "PT Sans Caption", fontsize = "16"];
+edge [dir = "both", minlen = "3", fontname = "PT Sans Caption", fontsize = "16", fontcolor = "#cc0000"];
+"services_db" [shape = "cylinder", width = "3", height = "3", penwidth = "3", label = "Services Database", pos = "0, 0!"];
+"images_storage" [shape = "cylinder", width = "3", height = "3", penwidth = "3", label = "Images Storage", pos = "0, -600!"];
+"collector" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Event Collector", pos = "500, -400!"];
+"main_api_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Main API Service", pos = "0, -200!"];
+"images_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Image Service", pos = "0, -400!"];
+"push_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Push Notification Service", pos = "1000, -200!"];
+"queue_manager" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Messages Queue Manager", pos = "500, -200!"];
+"ws_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "WebSocket Notification Service", pos = "1000, -400!"];
+"nginx" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "nginx", pos = "500, -600!"];
+"firebase" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/cloud.png", label = "Firebase", pos = "1500, -200!"];
+"client" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/client_device.png", labelloc = "b", label = "Client Device", pos = "2000, -600!"];
+subgraph cluster_1 {
+labelloc = "b";
+labeljust = "l";
+shape = "box";
+style = "rounded";
+penwidth = "3";
+margin = "36";
+color = "#999999";
+label = "Service Backend";
+"services_db";
+"images_storage";
+"collector";
+"main_api_service";
+"images_service";
+"push_service";
+"queue_manager";
+"ws_service";
+"nginx";
+}
+"nginx" -> "main_api_service";
+"nginx" -> "collector" [label = <<b>HTTP API</b><br />events data>];
+"nginx" -> "images_service" [label = <<b>HTTP</b><br />images>];
+"nginx" -> "ws_service" [label = <<b>WebSocket</b><br />notifications>];
+"main_api_service" -> "services_db";
+"main_api_service" -> "queue_manager" [arrowtail = "dot", label = <<b>NSQ</b><br />messages>];
+"images_service" -> "images_storage";
+"queue_manager" -> "push_service" [arrowtail = "dot", label = <<b>NSQ</b><br />messages>];
+"queue_manager" -> "ws_service" [arrowtail = "dot", label = <<b>NSQ</b><br />messages>];
+"push_service" -> "firebase" [arrowtail = "dot", label = <<b>HTTP API</b><br />push notifications>];
+"firebase" -> "client" [arrowtail = "dot", label = <<b>HTTP API</b><br />push notifications>];
+"client" -> "nginx" [label = <<b>HTTPS</b><br />client APIs>];
+subgraph {
+rank = "same";
+"services_db";
+"main_api_service";
+"images_service";
+"images_storage";
+}
+subgraph {
+rank = "same";
+"queue_manager";
+"collector";
+"nginx";
+}
+subgraph {
+rank = "same";
+"push_service";
+"ws_service";
+}
+subgraph {
+rank = "same";
+"firebase";
+}
+subgraph {
+rank = "same";
+"client";
+}
+}

@@ -1,0 +1,60 @@
+engine: dot
+elements:
+    graph:
+        newrank: true
+        rankdir: LR
+        splines: true
+        fontname: PT Sans Caption
+        fontsize: 16
+    node:
+        fixedsize: true
+        fontname: PT Sans Caption
+        fontsize: 16
+        classes:
+            generic:
+                shape: box
+                width: 4
+                height: 1
+                style: rounded
+                penwidth: 3
+            database:
+                shape: cylinder
+                width: 3
+                height: 3
+                penwidth: 3
+            external_network:
+                shape: box
+                width: 3
+                height: 3
+                penwidth: 0
+                image: ./source/style_1/cloud.png
+            client_device:
+                shape: box
+                width: 3
+                height: 3
+                penwidth: 0
+                image: ./source/style_1/client_device.png
+                labelloc: b
+    cluster:
+        labelloc: b
+        labeljust: l
+        shape: box
+        style: rounded
+        penwidth: 3
+        margin: 36
+        color: '#999999'
+    edge:
+        dir: both
+        minlen: 3
+        fontname: PT Sans Caption
+        fontsize: 16
+        fontcolor: '#cc0000'
+        classes:
+            udp_multicast:
+                color: '#0000cc'
+            hls:
+                color: '#009900'
+            mpeg-dash:
+                color: '#cc0099'
+            unidirectional:
+                arrowtail: dot

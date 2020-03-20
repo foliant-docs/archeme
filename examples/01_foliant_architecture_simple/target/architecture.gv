@@ -1,0 +1,73 @@
+digraph {
+graph [splines = "true", esep = "0.33", fontname = "PT Sans Caption", fontsize = "16"];
+node [shape = "box", fixedsize = "true", width = "4", height = "1", style = "rounded, filled", penwidth = "3", fontname = "PT Sans Caption", fontsize = "16"];
+edge [dir = "both", arrowtail = "dot", arrowhead = "normal"];
+"config" [fillcolor = "#f0fff0", label = "Project Config File", pos = "0, 0!"];
+"src" [fillcolor = "#f0fff0", label = "Project Sources", pos = "0, -200!"];
+"artifacts" [fillcolor = "#f0fff0", label = "Built Project", pos = "0, -400!"];
+"core" [fillcolor = "#f0f0ff", label = "Foliant Core", pos = "1200, 0!"];
+"config_extensions" [fillcolor = "#f0ffff", label = "Config Extensions", pos = "1600, -400!"];
+"cli_extensions" [fillcolor = "#f0ffff", label = "CLI Extensions", pos = "1600, -200!"];
+"preprocessor_1" [fillcolor = "#fff0f0", label = "Preprocessor 1", pos = "800, -200!"];
+"preprocessor_2" [fillcolor = "#fff0f0", label = "Preprocessor 2", pos = "800, -400!"];
+"preprocessor_n" [fillcolor = "#fff0f0", label = "Preprocessor N", pos = "800, -600!"];
+"backend_1" [fillcolor = "#fffff0", label = "Backend 1", pos = "800, -800!"];
+"backend_2" [fillcolor = "#fffff0", label = "Backend 2", pos = "1200, -800!"];
+"backend_m" [fillcolor = "#fffff0", label = "Backend M", pos = "1600, -800!"];
+"external_sources" [shape = "circle", width = "3", height = "3", fillcolor = "#f0f0f0", label = "External Sources,\ne.g. Swagger", pos = "2400, -600!"];
+"external_targets" [shape = "circle", width = "3", height = "3", fillcolor = "#f0f0f0", label = "External Targets,\ne.g. Confluence", pos = "1600, -1200!"];
+"config" -> "core" [color = "#000099"];
+"core" -> "config_extensions" [color = "#000099"];
+"core" -> "cli_extensions" [color = "#000099"];
+"core" -> "preprocessor_1" [color = "#000099"];
+"core" -> "preprocessor_2" [color = "#000099"];
+"core" -> "preprocessor_n" [color = "#000099"];
+"core" -> "backend_1" [color = "#000099"];
+"core" -> "backend_2" [color = "#000099"];
+"core" -> "backend_m" [color = "#000099"];
+"src" -> "preprocessor_1" [color = "#009900"];
+"preprocessor_1" -> "preprocessor_2" [color = "#009900"];
+"preprocessor_2" -> "preprocessor_n" [color = "#009900"];
+"external_sources" -> "preprocessor_n" [color = "#009900"];
+"preprocessor_n" -> "backend_1" [color = "#009900"];
+"preprocessor_n" -> "backend_2" [color = "#009900"];
+"preprocessor_n" -> "backend_m" [color = "#009900"];
+"backend_1" -> "artifacts" [color = "#009900"];
+"backend_2" -> "artifacts" [color = "#009900"];
+"backend_m" -> "external_targets" [color = "#009900"];
+subgraph {
+rank = "same";
+"config";
+"core";
+}
+subgraph {
+rank = "same";
+"src";
+"preprocessor_1";
+"cli_extensions";
+}
+subgraph {
+rank = "same";
+"artifacts";
+"preprocessor_2";
+"config_extensions";
+}
+subgraph {
+rank = "same";
+"preprocessor_n";
+"external_sources";
+}
+subgraph {
+rank = "same";
+"backend_1";
+"backend_2";
+"backend_m";
+}
+subgraph {
+rank = "same";
+}
+subgraph {
+rank = "same";
+"external_targets";
+}
+}

@@ -1,0 +1,172 @@
+structure:
+    # Local file system
+    - cluster:
+        label: Local File System
+        structure:
+            - node:
+                id: config
+                label: Project Config File
+                class:
+                    - component
+                    - file
+            - node:
+                id: src
+                label: Project Sources
+                class:
+                    - component
+                    - file
+            - node:
+                id: artifacts
+                label: Built Project
+                class:
+                    - component
+                    - file
+    # Foliant ecosystem including Foliant itself, and extensions of different types
+    - cluster:
+        label: Foliant Ecosystem
+        structure:
+            - node:
+                id: core
+                label: Foliant Core
+                class:
+                    - component
+                    - manager
+            - cluster:
+                label: Foliant Extensions
+                structure:
+                    - node:
+                        id: config_extensions
+                        label: Config Extensions
+                        class:
+                            - component
+                            - extension
+                    - node:
+                        id: cli_extensions
+                        label: CLI Extensions
+                        class:
+                            - component
+                            - extension
+                    - node:
+                        id: preprocessor_1
+                        label: Preprocessor 1
+                        class:
+                            - component
+                            - preprocessor
+                    - node:
+                        id: preprocessor_2
+                        label: Preprocessor 2
+                        class:
+                            - component
+                            - preprocessor
+                    - node:
+                        id: more_preprocessors
+                        class: ellipsis
+                    - node:
+                        id: preprocessor_n
+                        label: Preprocessor N
+                        class:
+                            - component
+                            - preprocessor
+                    - node:
+                        id: backend_1
+                        label: Backend 1
+                        class:
+                            - component
+                            - backend
+                    - node:
+                        id: backend_2
+                        label: Backend 2
+                        class:
+                            - component
+                            - backend
+                    - node:
+                        id: more_backends
+                        class: ellipsis
+                    - node:
+                        id: backend_m
+                        label: Backend M
+                        class:
+                            - component
+                            - backend
+    # External services
+    - cluster:
+        label: External Services
+        structure:
+            - node:
+                id: external_sources
+                label: 'External Sources,\ne.g. Swagger'
+                class: external_service
+            - node:
+                id: external_targets
+                label: 'External Targets,\ne.g. Confluence'
+                class: external_service
+edges:
+    # Control interactions
+    -   tail: config
+        head: core
+        class: control
+    -   tail: core
+        head: config_extensions
+        class: control
+    -   tail: core
+        head: cli_extensions
+        class: control
+    -   tail: core
+        head: preprocessor_1
+        class: control
+    -   tail: core
+        head: preprocessor_2
+        class: control
+    -   tail: core
+        head: preprocessor_n
+        class: control
+    -   tail: core
+        head: backend_1
+        class: control
+    -   tail: core
+        head: backend_2
+        class: control
+    -   tail: core
+        head: backend_m
+        class: control
+    # Data flows
+    -   tail: src
+        head: preprocessor_1
+        class: data
+    -   tail: preprocessor_1
+        head: preprocessor_2
+        class: data
+    -   tail: preprocessor_2
+        head: more_preprocessors
+        class: data
+    -   tail: more_preprocessors
+        head: preprocessor_n
+        class: data
+    -   tail: external_sources
+        head: preprocessor_n
+        class: data
+    -   tail: preprocessor_n
+        head: backend_1
+        class: data
+    -   tail: preprocessor_n
+        head: backend_2
+        class: data
+    -   tail: preprocessor_n
+        head: backend_m
+        class: data
+    -   tail: backend_1
+        head: artifacts
+        class: data
+    -   tail: backend_2
+        head: artifacts
+        class: data
+    -   tail: backend_m
+        head: external_targets
+        class: data
+grid: |
+    config                             core
+    src          preprocessor_1                     cli_extensions    config_extensions
+    artifacts    preprocessor_2
+                 more_preprocessors
+                 preprocessor_n                                                            external_sources
+                 backend_1             backend_2    more_backends     backend_m            external_targets

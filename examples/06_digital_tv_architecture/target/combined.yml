@@ -1,0 +1,198 @@
+edges:
+-   class:
+    - hls
+    - unidirectional
+    head: client
+    label:
+        data: streaming
+        protocol: HLS
+    tail: ott_dvr.cdn
+-   head: ott_dvr.drm_proxy
+    label:
+        data: DRM keys
+        protocol: HTTP API
+    tail: client
+-   class: unidirectional
+    head: client
+    label:
+        data: push notifications
+        protocol: HTTP API
+    tail: service_backend.firebase
+-   head: service_backend.nginx
+    label:
+        data: client APIs
+        protocol: HTTPS
+    tail: client
+-   class:
+    - udp_multicast
+    - unidirectional
+    head: ott_dvr.recorder
+    label:
+        data: TV Channels
+        protocol: UDP Multicast
+    tail: ott_dvr.mcast_network
+-   class: unidirectional
+    head: ott_dvr.file_storage
+    label: content and index files
+    tail: ott_dvr.recorder
+-   class: unidirectional
+    head: ott_dvr.hls_packager
+    label: index files
+    tail: ott_dvr.file_storage
+-   head: ott_dvr.nginx
+    label:
+        class: unidirectional
+        data: HLS playlists
+        protocol: FastCGI
+    tail: ott_dvr.hls_packager
+-   class: unidirectional
+    head: ott_dvr.nginx
+    label: content files
+    tail: ott_dvr.file_storage
+-   head: ott_dvr.drm_proxy
+    label:
+        data: DRM keys
+        protocol: HTTP API
+    tail: ott_dvr.recorder
+-   head: ott_dvr.license_server
+    tail: ott_dvr.drm_proxy
+-   class:
+    - hls
+    - unidirectional
+    head: ott_dvr.cdn
+    label:
+        data: streaming
+        protocol: HLS
+    tail: ott_dvr.nginx
+-   head: service_backend.main_api_service
+    tail: service_backend.nginx
+-   head: service_backend.collector
+    label:
+        data: events data
+        protocol: HTTP API
+    tail: service_backend.nginx
+-   head: service_backend.images_service
+    label:
+        data: images
+        protocol: HTTP
+    tail: service_backend.nginx
+-   head: service_backend.ws_service
+    label:
+        data: notifications
+        protocol: WebSocket
+    tail: service_backend.nginx
+-   head: service_backend.services_db
+    tail: service_backend.main_api_service
+-   class: unidirectional
+    head: service_backend.queue_manager
+    label:
+        data: messages
+        protocol: NSQ
+    tail: service_backend.main_api_service
+-   head: service_backend.images_storage
+    tail: service_backend.images_service
+-   class: unidirectional
+    head: service_backend.push_service
+    label:
+        data: messages
+        protocol: NSQ
+    tail: service_backend.queue_manager
+-   class: unidirectional
+    head: service_backend.ws_service
+    label:
+        data: messages
+        protocol: NSQ
+    tail: service_backend.queue_manager
+-   class: unidirectional
+    head: service_backend.firebase
+    label:
+        data: push notifications
+        protocol: HTTP API
+    tail: service_backend.push_service
+grid: "ott_dvr.mcast_network\n                                    ott_dvr.license_server\nott_dvr.recorder                    ott_dvr.drm_proxy\nott_dvr.file_storage                ott_dvr.hls_packager                ott_dvr.nginx                       ott_dvr.cdn\n                                                                                                                                                                   client\nservice_backend.services_db\nservice_backend.main_api_service    service_backend.queue_manager       service_backend.push_service        service_backend.firebase\nservice_backend.images_service      service_backend.collector           service_backend.ws_service\nservice_backend.images_storage      service_backend.nginx\n"
+structure:
+-   node:
+        class: external_network
+        id: ott_dvr.mcast_network
+        label: Multicast\nNetwork
+-   cluster:
+        label: OTT DVR Subsystem
+        structure:
+        -   node:
+                class: generic
+                id: ott_dvr.recorder
+                label: Recorder
+        -   node:
+                class: database
+                id: ott_dvr.file_storage
+                label: File Storage
+        -   cluster:
+                label: DRM Infrastructure
+                structure:
+                -   node:
+                        class: generic
+                        id: ott_dvr.license_server
+                        label: DRM License Server
+                -   node:
+                        class: generic
+                        id: ott_dvr.drm_proxy
+                        label: DRM Proxy Server
+        -   node:
+                class: generic
+                id: ott_dvr.hls_packager
+                label: HLS Packager
+        -   node:
+                class: generic
+                id: ott_dvr.nginx
+                label: nginx
+-   node:
+        class: external_network
+        id: ott_dvr.cdn
+        label: Content\nDelivery Network
+-   cluster:
+        label: Service Backend
+        structure:
+        -   node:
+                class: database
+                id: service_backend.services_db
+                label: Services Database
+        -   node:
+                class: database
+                id: service_backend.images_storage
+                label: Images Storage
+        -   node:
+                class: generic
+                id: service_backend.collector
+                label: Event Collector
+        -   node:
+                class: generic
+                id: service_backend.main_api_service
+                label: Main API Service
+        -   node:
+                class: generic
+                id: service_backend.images_service
+                label: Image Service
+        -   node:
+                class: generic
+                id: service_backend.push_service
+                label: Push Notification Service
+        -   node:
+                class: generic
+                id: service_backend.queue_manager
+                label: Messages Queue Manager
+        -   node:
+                class: generic
+                id: service_backend.ws_service
+                label: WebSocket Notification Service
+        -   node:
+                class: generic
+                id: service_backend.nginx
+                label: nginx
+-   node:
+        class: external_network
+        id: service_backend.firebase
+        label: Firebase
+-   node:
+        class: client_device
+        id: client
+        label: Client Device

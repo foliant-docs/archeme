@@ -1,0 +1,103 @@
+structure:
+    - node:
+        id: mcast_network
+        label: Multicast\nNetwork
+        class: external_network
+    - cluster:
+        label: OTT DVR Subsystem
+        structure:
+            - node:
+                id: recorder
+                label: Recorder
+                class: generic
+            - node:
+                id: file_storage
+                label: File Storage
+                class: database
+            - cluster:
+                label: DRM Infrastructure
+                structure:
+                    - node:
+                        id: license_server
+                        label: DRM License Server
+                        class: generic
+                    - node:
+                        id: drm_proxy
+                        label: DRM Proxy Server
+                        class: generic
+            - node:
+                id: hls_packager
+                label: HLS Packager
+                class: generic
+            - node:
+                id: nginx
+                label: nginx
+                class: generic
+    - node:
+        id: cdn
+        label: Content\nDelivery Network
+        class: external_network
+    - node:
+        id: client
+        label: Client Device
+        class: client_device
+edges:
+    -   tail: mcast_network
+        head: recorder
+        label:
+            protocol: UDP Multicast
+            data: TV Channels
+        class:
+            - udp_multicast
+            - unidirectional
+    -   tail: recorder
+        head: file_storage
+        label: content and index files
+        class: unidirectional
+    -   tail: file_storage
+        head: hls_packager
+        label: index files
+        class: unidirectional
+    -   tail: hls_packager
+        head: nginx
+        label:
+            protocol: FastCGI
+            data: HLS playlists
+            class: unidirectional
+    -   tail: file_storage
+        head: nginx
+        label: content files
+        class: unidirectional
+    -   tail: recorder
+        head: drm_proxy
+        label:
+            protocol: HTTP API
+            data: DRM keys
+    -   tail: drm_proxy
+        head: license_server
+    -   tail: nginx
+        head: cdn
+        label:
+            protocol: HLS
+            data: streaming
+        class:
+            - hls
+            - unidirectional
+    -   tail: cdn
+        head: client
+        label:
+            protocol: HLS
+            data: streaming
+        class:
+            - hls
+            - unidirectional
+    -   tail: client
+        head: drm_proxy
+        label:
+            protocol: HTTP API
+            data: DRM keys
+grid: |
+    mcast_network
+                     license_server
+    recorder         drm_proxy
+    file_storage     hls_packager      nginx    cdn    client

@@ -1,0 +1,125 @@
+digraph {
+graph [newrank = "true", rankdir = "LR", splines = "true", fontname = "PT Sans Caption", fontsize = "16"];
+node [fixedsize = "true", fontname = "PT Sans Caption", fontsize = "16"];
+edge [dir = "both", minlen = "3", fontname = "PT Sans Caption", fontsize = "16", fontcolor = "#cc0000"];
+"ott_dvr.mcast_network" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/cloud.png", label = "Multicast\nNetwork", pos = "0, 0!"];
+"ott_dvr.recorder" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Recorder", pos = "0, -400!"];
+"ott_dvr.file_storage" [shape = "cylinder", width = "3", height = "3", penwidth = "3", label = "File Storage", pos = "0, -600!"];
+"ott_dvr.license_server" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "DRM License Server", pos = "500, -200!"];
+"ott_dvr.drm_proxy" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "DRM Proxy Server", pos = "500, -400!"];
+"ott_dvr.hls_packager" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "HLS Packager", pos = "500, -600!"];
+"ott_dvr.nginx" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "nginx", pos = "1000, -600!"];
+"ott_dvr.cdn" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/cloud.png", label = "Content\nDelivery Network", pos = "1500, -600!"];
+"service_backend.services_db" [shape = "cylinder", width = "3", height = "3", penwidth = "3", label = "Services Database", pos = "0, -1000!"];
+"service_backend.images_storage" [shape = "cylinder", width = "3", height = "3", penwidth = "3", label = "Images Storage", pos = "0, -1600!"];
+"service_backend.collector" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Event Collector", pos = "500, -1400!"];
+"service_backend.main_api_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Main API Service", pos = "0, -1200!"];
+"service_backend.images_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Image Service", pos = "0, -1400!"];
+"service_backend.push_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Push Notification Service", pos = "1000, -1200!"];
+"service_backend.queue_manager" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Messages Queue Manager", pos = "500, -1200!"];
+"service_backend.ws_service" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "WebSocket Notification Service", pos = "1000, -1400!"];
+"service_backend.nginx" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "nginx", pos = "500, -1600!"];
+"service_backend.firebase" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/cloud.png", label = "Firebase", pos = "1500, -1200!"];
+"client" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/client_device.png", labelloc = "b", label = "Client Device", pos = "2000, -800!"];
+subgraph cluster_1 {
+labelloc = "b";
+labeljust = "l";
+shape = "box";
+style = "rounded";
+penwidth = "3";
+margin = "36";
+color = "#999999";
+label = "OTT DVR Subsystem";
+"ott_dvr.recorder";
+"ott_dvr.file_storage";
+"ott_dvr.hls_packager";
+"ott_dvr.nginx";
+subgraph cluster_1_1 {
+labelloc = "b";
+labeljust = "l";
+shape = "box";
+style = "rounded";
+penwidth = "3";
+margin = "36";
+color = "#999999";
+label = "DRM Infrastructure";
+"ott_dvr.license_server";
+"ott_dvr.drm_proxy";
+}
+}
+subgraph cluster_2 {
+labelloc = "b";
+labeljust = "l";
+shape = "box";
+style = "rounded";
+penwidth = "3";
+margin = "36";
+color = "#999999";
+label = "Service Backend";
+"service_backend.services_db";
+"service_backend.images_storage";
+"service_backend.collector";
+"service_backend.main_api_service";
+"service_backend.images_service";
+"service_backend.push_service";
+"service_backend.queue_manager";
+"service_backend.ws_service";
+"service_backend.nginx";
+}
+"ott_dvr.cdn" -> "client" [color = "#009900", arrowtail = "dot", label = <<b>HLS</b><br />streaming>];
+"client" -> "ott_dvr.drm_proxy" [label = <<b>HTTP API</b><br />DRM keys>];
+"service_backend.firebase" -> "client" [arrowtail = "dot", label = <<b>HTTP API</b><br />push notifications>];
+"client" -> "service_backend.nginx" [label = <<b>HTTPS</b><br />client APIs>];
+"ott_dvr.mcast_network" -> "ott_dvr.recorder" [color = "#0000cc", arrowtail = "dot", label = <<b>UDP Multicast</b><br />TV Channels>];
+"ott_dvr.recorder" -> "ott_dvr.file_storage" [arrowtail = "dot", label = "content and index files"];
+"ott_dvr.file_storage" -> "ott_dvr.hls_packager" [arrowtail = "dot", label = "index files"];
+"ott_dvr.hls_packager" -> "ott_dvr.nginx" [label = <<b>FastCGI</b><br />HLS playlists>];
+"ott_dvr.file_storage" -> "ott_dvr.nginx" [arrowtail = "dot", label = "content files"];
+"ott_dvr.recorder" -> "ott_dvr.drm_proxy" [label = <<b>HTTP API</b><br />DRM keys>];
+"ott_dvr.drm_proxy" -> "ott_dvr.license_server";
+"ott_dvr.nginx" -> "ott_dvr.cdn" [color = "#009900", arrowtail = "dot", label = <<b>HLS</b><br />streaming>];
+"service_backend.nginx" -> "service_backend.main_api_service";
+"service_backend.nginx" -> "service_backend.collector" [label = <<b>HTTP API</b><br />events data>];
+"service_backend.nginx" -> "service_backend.images_service" [label = <<b>HTTP</b><br />images>];
+"service_backend.nginx" -> "service_backend.ws_service" [label = <<b>WebSocket</b><br />notifications>];
+"service_backend.main_api_service" -> "service_backend.services_db";
+"service_backend.main_api_service" -> "service_backend.queue_manager" [arrowtail = "dot", label = <<b>NSQ</b><br />messages>];
+"service_backend.images_service" -> "service_backend.images_storage";
+"service_backend.queue_manager" -> "service_backend.push_service" [arrowtail = "dot", label = <<b>NSQ</b><br />messages>];
+"service_backend.queue_manager" -> "service_backend.ws_service" [arrowtail = "dot", label = <<b>NSQ</b><br />messages>];
+"service_backend.push_service" -> "service_backend.firebase" [arrowtail = "dot", label = <<b>HTTP API</b><br />push notifications>];
+subgraph {
+rank = "same";
+"ott_dvr.mcast_network";
+"ott_dvr.recorder";
+"ott_dvr.file_storage";
+"service_backend.services_db";
+"service_backend.main_api_service";
+"service_backend.images_service";
+"service_backend.images_storage";
+}
+subgraph {
+rank = "same";
+"ott_dvr.license_server";
+"ott_dvr.drm_proxy";
+"ott_dvr.hls_packager";
+"service_backend.queue_manager";
+"service_backend.collector";
+"service_backend.nginx";
+}
+subgraph {
+rank = "same";
+"ott_dvr.nginx";
+"service_backend.push_service";
+"service_backend.ws_service";
+}
+subgraph {
+rank = "same";
+"ott_dvr.cdn";
+"service_backend.firebase";
+}
+subgraph {
+rank = "same";
+"client";
+}
+}

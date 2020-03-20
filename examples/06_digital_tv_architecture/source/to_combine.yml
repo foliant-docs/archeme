@@ -1,0 +1,44 @@
+structure:
+    - module:
+        id: ott_dvr
+        file: ./source/ott_dvr_subsystem.yml
+        exclude:
+            - client
+    - module:
+        id: service_backend
+        file: ./source/service_backend.yml
+        exclude:
+            - client
+    - node:
+        id: client
+        label: Client Device
+        class: client_device
+edges:
+    -   tail: ott_dvr.cdn
+        head: client
+        label:
+            protocol: HLS
+            data: streaming
+        class:
+            - hls
+            - unidirectional
+    -   tail: client
+        head: ott_dvr.drm_proxy
+        label:
+            protocol: HTTP API
+            data: DRM keys
+    -   tail: service_backend.firebase
+        head: client
+        label:
+            protocol: HTTP API
+            data: push notifications
+        class: unidirectional
+    -   tail: client
+        head: service_backend.nginx
+        label:
+            protocol: HTTPS
+            data: client APIs
+grid: |
+    ott_dvr
+                       client
+    service_backend

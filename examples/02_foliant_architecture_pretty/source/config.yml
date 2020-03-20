@@ -1,0 +1,54 @@
+engine: neato
+elements:
+    graph:
+        splines: true
+        fontname: PT Sans Caption
+        fontsize: 16
+    node:
+        shape: box
+        fixedsize: true
+        width: 4
+        height: 1
+        penwidth: 3
+        fontname: PT Sans Caption
+        fontsize: 16
+        classes:
+            caption:
+                penwidth: 0
+                fontsize: 24
+            ellipsis:
+                penwidth: 0
+                fontsize: 48
+                label: •••
+            component:
+                style:
+                    - rounded
+                    - filled
+            file:
+                fillcolor: '#f0fff0'
+            manager:
+                fillcolor: '#f0f0ff'
+            extension:
+                fillcolor: '#f0ffff'
+            preprocessor:
+                fillcolor: '#fff0f0'
+            backend:
+                fillcolor: '#fffff0'
+            external_service:
+                shape: circle
+                width: 2.5
+                height: 2.5
+                style: filled
+                fillcolor: '#f0f0f0'
+    edge:
+        dir: both
+        arrowtail: dot
+        arrowhead: normal
+        classes:
+            control:
+                color: '#000099'
+            data:
+                color: '#009900'
+    grid:
+        spacing_x: 400
+        spacing_y: 200

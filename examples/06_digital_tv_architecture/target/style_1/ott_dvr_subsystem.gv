@@ -1,0 +1,74 @@
+digraph {
+graph [newrank = "true", rankdir = "LR", splines = "true", fontname = "PT Sans Caption", fontsize = "16"];
+node [fixedsize = "true", fontname = "PT Sans Caption", fontsize = "16"];
+edge [dir = "both", minlen = "3", fontname = "PT Sans Caption", fontsize = "16", fontcolor = "#cc0000"];
+"mcast_network" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/cloud.png", label = "Multicast\nNetwork", pos = "0, 0!"];
+"recorder" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "Recorder", pos = "0, -400!"];
+"file_storage" [shape = "cylinder", width = "3", height = "3", penwidth = "3", label = "File Storage", pos = "0, -600!"];
+"license_server" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "DRM License Server", pos = "500, -200!"];
+"drm_proxy" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "DRM Proxy Server", pos = "500, -400!"];
+"hls_packager" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "HLS Packager", pos = "500, -600!"];
+"nginx" [shape = "box", width = "4", height = "1", style = "rounded", penwidth = "3", label = "nginx", pos = "1000, -600!"];
+"cdn" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/cloud.png", label = "Content\nDelivery Network", pos = "1500, -600!"];
+"client" [shape = "box", width = "3", height = "3", penwidth = "0", image = "./source/style_1/client_device.png", labelloc = "b", label = "Client Device", pos = "2000, -600!"];
+subgraph cluster_1 {
+labelloc = "b";
+labeljust = "l";
+shape = "box";
+style = "rounded";
+penwidth = "3";
+margin = "36";
+color = "#999999";
+label = "OTT DVR Subsystem";
+"recorder";
+"file_storage";
+"hls_packager";
+"nginx";
+subgraph cluster_1_1 {
+labelloc = "b";
+labeljust = "l";
+shape = "box";
+style = "rounded";
+penwidth = "3";
+margin = "36";
+color = "#999999";
+label = "DRM Infrastructure";
+"license_server";
+"drm_proxy";
+}
+}
+"mcast_network" -> "recorder" [color = "#0000cc", arrowtail = "dot", label = <<b>UDP Multicast</b><br />TV Channels>];
+"recorder" -> "file_storage" [arrowtail = "dot", label = "content and index files"];
+"file_storage" -> "hls_packager" [arrowtail = "dot", label = "index files"];
+"hls_packager" -> "nginx" [label = <<b>FastCGI</b><br />HLS playlists>];
+"file_storage" -> "nginx" [arrowtail = "dot", label = "content files"];
+"recorder" -> "drm_proxy" [label = <<b>HTTP API</b><br />DRM keys>];
+"drm_proxy" -> "license_server";
+"nginx" -> "cdn" [color = "#009900", arrowtail = "dot", label = <<b>HLS</b><br />streaming>];
+"cdn" -> "client" [color = "#009900", arrowtail = "dot", label = <<b>HLS</b><br />streaming>];
+"client" -> "drm_proxy" [label = <<b>HTTP API</b><br />DRM keys>];
+subgraph {
+rank = "same";
+"mcast_network";
+"recorder";
+"file_storage";
+}
+subgraph {
+rank = "same";
+"license_server";
+"drm_proxy";
+"hls_packager";
+}
+subgraph {
+rank = "same";
+"nginx";
+}
+subgraph {
+rank = "same";
+"cdn";
+}
+subgraph {
+rank = "same";
+"client";
+}
+}

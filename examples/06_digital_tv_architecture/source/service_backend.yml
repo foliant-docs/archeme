@@ -1,0 +1,110 @@
+structure:
+    - cluster:
+        label: Service Backend
+        structure:
+            - node:
+                id: services_db
+                label: Services Database
+                class: database
+            - node:
+                id: images_storage
+                label: Images Storage
+                class: database
+            - node:
+                id: collector
+                label: Event Collector
+                class: generic
+            - node:
+                id: main_api_service
+                label: Main API Service
+                class: generic
+            - node:
+                id: images_service
+                label: Image Service
+                class: generic
+            - node:
+                id: push_service
+                label: Push Notification Service
+                class: generic
+            - node:
+                id: queue_manager
+                label: Messages Queue Manager
+                class: generic
+            - node:
+                id: ws_service
+                label: WebSocket Notification Service
+                class: generic
+            - node:
+                id: nginx
+                label: nginx
+                class: generic
+    - node:
+        id: firebase
+        label: Firebase
+        class: external_network
+    - node:
+        id: client
+        label: Client Device
+        class: client_device
+edges:
+    -   tail: nginx
+        head: main_api_service
+    -   tail: nginx
+        head: collector
+        label:
+            protocol: HTTP API
+            data: events data
+    -   tail: nginx
+        head: images_service
+        label:
+            protocol: HTTP
+            data: images
+    -   tail: nginx
+        head: ws_service
+        label:
+            protocol: WebSocket
+            data: notifications
+    -   tail: main_api_service
+        head: services_db
+    -   tail: main_api_service
+        head: queue_manager
+        label:
+            protocol: NSQ
+            data: messages
+        class: unidirectional
+    -   tail: images_service
+        head: images_storage
+    -   tail: queue_manager
+        head: push_service
+        label:
+            protocol: NSQ
+            data: messages
+        class: unidirectional
+    -   tail: queue_manager
+        head: ws_service
+        label:
+            protocol: NSQ
+            data: messages
+        class: unidirectional
+    -   tail: push_service
+        head: firebase
+        label:
+            protocol: HTTP API
+            data: push notifications
+        class: unidirectional
+    -   tail: firebase
+        head: client
+        label:
+            protocol: HTTP API
+            data: push notifications
+        class: unidirectional
+    -   tail: client
+        head: nginx
+        label:
+            protocol: HTTPS
+            data: client APIs
+grid: |
+    services_db
+    main_api_service    queue_manager    push_service    firebase
+    images_service      collector        ws_service
+    images_storage      nginx                                        client
