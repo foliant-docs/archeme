@@ -1,6 +1,6 @@
 digraph {
 graph [splines = "true", esep = "0.33", fontname = "PT Sans Caption", fontsize = "16"];
-node [shape = "box", fixedsize = "true", width = "4", height = "1", style = "rounded, filled", penwidth = "3", fontname = "PT Sans Caption", fontsize = "16"];
+node [shape = "box", fixedsize = "true", width = "4", height = "1", penwidth = "3", fontname = "PT Sans Caption", fontsize = "16", style = "rounded, filled"];
 edge [dir = "both", arrowtail = "dot", arrowhead = "normal"];
 "config" [fillcolor = "#f0fff0", label = "Project Config File", pos = "0, 0!"];
 "src" [fillcolor = "#f0fff0", label = "Project Sources", pos = "0, -200!"];
@@ -35,39 +35,4 @@ edge [dir = "both", arrowtail = "dot", arrowhead = "normal"];
 "backend_1" -> "artifacts" [color = "#009900"];
 "backend_2" -> "artifacts" [color = "#009900"];
 "backend_m" -> "external_targets" [color = "#009900"];
-subgraph {
-rank = "same";
-"config";
-"core";
-}
-subgraph {
-rank = "same";
-"src";
-"preprocessor_1";
-"cli_extensions";
-}
-subgraph {
-rank = "same";
-"artifacts";
-"preprocessor_2";
-"config_extensions";
-}
-subgraph {
-rank = "same";
-"preprocessor_n";
-"external_sources";
-}
-subgraph {
-rank = "same";
-"backend_1";
-"backend_2";
-"backend_m";
-}
-subgraph {
-rank = "same";
-}
-subgraph {
-rank = "same";
-"external_targets";
-}
 }

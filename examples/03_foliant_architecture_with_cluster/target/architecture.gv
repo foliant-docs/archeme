@@ -22,9 +22,9 @@ subgraph cluster_1 {
 labelloc = "b";
 labeljust = "l";
 shape = "box";
-style = "rounded";
 penwidth = "3";
 color = "#999999";
+style = "rounded";
 label = "Foliant Ecosystem";
 "core";
 "config_extensions";
@@ -58,38 +58,4 @@ label = "Foliant Ecosystem";
 "backend_1" -> "artifacts" [color = "#009900"];
 "backend_2" -> "artifacts" [color = "#009900"];
 "backend_m" -> "external_targets" [color = "#009900"];
-subgraph {
-rank = "same";
-"config";
-"core";
-}
-subgraph {
-rank = "same";
-"src";
-"preprocessor_1";
-"cli_extensions";
-"config_extensions";
-}
-subgraph {
-rank = "same";
-"artifacts";
-"preprocessor_2";
-}
-subgraph {
-rank = "same";
-"more_preprocessors";
-}
-subgraph {
-rank = "same";
-"preprocessor_n";
-"external_sources";
-}
-subgraph {
-rank = "same";
-"backend_1";
-"backend_2";
-"more_backends";
-"backend_m";
-"external_targets";
-}
 }

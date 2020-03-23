@@ -289,14 +289,21 @@ class GenerateGraphvizSource():
 
             return nodes
 
-        dsl_to_gv_intermediate.update (
+        if dsl_full_scheme.get('engine', 'dot') == 'neato' or dsl_full_scheme.get('engine', 'dot') == 'fdp':
+            dsl_to_gv_intermediate.update(_append_positions(self._get_nodes(dsl_full_scheme)))
+
+        else:
+            dsl_to_gv_intermediate.update(self._get_nodes(dsl_full_scheme))
+
+        dsl_to_gv_intermediate.update(
             {
-                **_append_positions(self._get_nodes(dsl_full_scheme)),
                 **self._get_clusters(dsl_full_scheme),
-                **self._get_edges(dsl_full_scheme),
-                **self._get_subgraphs(dsl_full_scheme)
+                **self._get_edges(dsl_full_scheme)
             }
         )
+
+        if dsl_full_scheme.get('engine', 'dot') == 'dot':
+            dsl_to_gv_intermediate.update(self._get_subgraphs(dsl_full_scheme))
 
         return dsl_to_gv_intermediate
 
