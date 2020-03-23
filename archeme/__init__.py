@@ -1,5 +1,6 @@
 import sys
 import getopt
+from subprocess import run, PIPE, STDOUT, CalledProcessError
 from pathlib import Path
 from yaml import load, Loader
 
@@ -10,7 +11,7 @@ from archeme.merge import MergeMultipleSchemes
 def exit_on_wrong_command():
     print('''Usage:
 
-archeme generate [-c <config_file>] -i <input_file> -o <output_file>
+archeme generate [-c|--config <config_file>] -i|--input <input_file> -o|--output <output_file> [-d|--draw <format>]
 
 or
 
@@ -31,22 +32,30 @@ def entry_point():
     config_file_path = None
     input_file_path = None
     output_file_path = None
+    draw_format = None
 
     try:
-        options, arguments = getopt.getopt(sys.argv[2:], 'c:i:o:', ['config', 'input=', 'output='])
+        options, arguments = getopt.getopt(
+            sys.argv[2:],
+            'c:i:o:d:',
+            ['config=', 'input=', 'output=', 'draw=']
+        )
 
     except getopt.GetoptError:
         exit_on_wrong_command()
 
     for option, argument in options:
-        if option in ("-c", "--config"):
+        if option in ('-c', '--config'):
             config_file_path = Path(argument).resolve()
 
-        elif option in ("-i", "--input"):
+        elif option in ('-i', '--input'):
             input_file_path = Path(argument).resolve()
 
-        elif option in ("-o", "--output"):
+        elif option in ('-o', '--output'):
             output_file_path = Path(argument).resolve()
+
+        elif option in ('-d', '--draw'):
+            draw_format = argument
 
         else:
             exit_on_wrong_command()
@@ -71,3 +80,36 @@ def entry_point():
 
     with open(output_file_path, 'w', encoding='utf8') as output_file:
         output_file.write(output)
+
+    if action == 'generate' and draw_format:
+        draw_engine = input.get('engine', 'dot')
+
+        if draw_engine == 'dot':
+            draw_command = f'{draw_engine} '
+
+        elif draw_engine == 'neato' or draw_engine == 'fdp':
+            draw_command = f'{draw_engine} -n '
+
+        else:
+            print(f'WARNING: the specified engine {draw_engine} is unknown. Only dot, neato, and fdp are supported')
+
+            draw_command = f'{draw_engine} '
+
+        drawing_file_path = output_file_path.parent / f'{output_file_path.stem}.{draw_format}'
+
+        draw_command += f'-T {draw_format} "{output_file_path}" -o "{drawing_file_path}"'
+
+        print(f'Trying to execute the command:\n{draw_command}')
+
+        try:
+            command_output = run(draw_command, shell=True, check=True, stdout=PIPE, stderr=STDOUT)
+
+            if command_output.stdout:
+                command_output_decoded = command_output.stdout.decode('utf8', errors='ignore')
+
+                print(command_output_decoded)
+
+        except CalledProcessError as exception:
+            print(str(exception))
+
+            sys.exit(1)
