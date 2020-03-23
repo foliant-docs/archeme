@@ -15,7 +15,7 @@ archeme generate [-c|--config <config_file>] -i|--input <input_file> -o|--output
 
 or
 
-archeme merge -i <input_file> -o <output_file>
+archeme merge -i|--input <input_file> -o|--output <output_file>
 ''')
 
     sys.exit(2)
