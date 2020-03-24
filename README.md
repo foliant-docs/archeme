@@ -61,31 +61,179 @@ The command takes 2 mandatory arguments: `-i`/`--input` for input YAML-based DSL
 
 ## YAML-Based DSL
 
-**TODO, not ready yet.**
+To describe schemes and diagrams, YAML-based DSL is provided.
+
+DSL, same as Graphviz, operates the graph theory terms: so, *graph* is the whole drawing; *node* is a functional component of a scheme or a diagram; *cluster* is a group of nodes; *edge* is a line that represents a relation between two nodes.
+
+DSL may be used to:
+
+* specify common settings of multiple elements;
+* define scheme structure and relations between elements;
+* describe each separate element—node, cluster, edge;
+* set relative positions of elements;
+* describe how it’s needed to combine multiple scheme descriptions into a single one.
+
+### Common Setting
+
+Common settings for multiple elements usually should be specified in the config file.
+
+#### Graphviz Engine
+
+The `engine` parameter sets the certain Graphviz engine to draw images. Archeme supports the `dot`, `neato`, and `fdp` engines. The default engine is `dot`.
+
+Code example:
+
+```yaml
+engine: neato
+```
+
+You may read about the difference between engines in the [Graphviz documentation](https://www.graphviz.org/about/). In relation to architectural schemes:
+
+* `dot` is suitable for models with hierarchical relations; using `dot`, you can’t strictly control relative positions of elements—the positions depend of ranks of elements; `dot` supports clusters;
+* `neato` allows to set strict fixed positions to each node; it doesn’t support clusters;
+* `fdp` is similar to `neato` but it supports clusters; however, if clusters are used, `fdp` re-calculates the positions of nodes, they can’t be strictly fixed.
+
+#### Settings Of Elements
+
+In `elements` section, you may specify common settings of the element of different types—graph, node, cluster, edge. In the simplest case, DSL maps to Graphviz syntax. DSL code example:
+
+```yaml
+elements:
+    graph:
+        newrank: true
+        rankdir: TB
+    node:
+        shape: box
+        fixedsize: true
+        width: 4
+        height: 1
+        style:
+            - filled
+            - rounded
+    edge:
+        dir: both
+        arrowtail: dot
+```
+
+This example will be converted into the following description for Graphviz:
+
+```
+graph [newrank = "true", rankdir: "TB"]
+node [shape = "box", fixedsize = "true", width = "4", height = "1", style = "filled, rounded"]
+edge [dir = "both", arrowtail = "dot"]
+```
+
+All available parameters for graphs, nodes, edges are described in the [Graphviz documentation](https://www.graphviz.org/doc/info/attrs.html).
+
+In addition to `graph`, `node`, and `edge` parameters, Archeme supports the analogous `cluster` parameter that allows to specify default settings for clusters. Code example:
+
+```yaml
+elements:
+    cluster:
+        labelloc: b
+        labeljust: l
+        shape: box
+```
+
+Note that you may reduce the number of lines of YAML-based DSL code. So, node settings from the example above may look like this:
+
+```yaml
+node {shape: box, fixedsize: true, width: 4, height: 1, style: [filled, rounded]}
+```
+
+Archeme allows to specify parameters with lists of values in different ways. The constructions `style: [filled, rounded]`, `style: filled, rounded`, `style: [filled]`, `style: filled` are valid.
+
+Note that if a node, cluster, or edge has some custom `style` or another parameter with a list of values, it will **fully** override the default `style` or whatever. This is how it works in Graphviz, and Archeme doesn’t change this behavior.
+
+For example, if the default `style` for nodes is `[filled, rounded]`, and the custom `style` of some node is `dashed`, only `dashed` will be applied to this node.
+
+##### Classes Definition
+
+To control the settings of elements more flexible, classes are provided.
+
+You may define one or more classes for each type of elements (`node`, `cluster`, `edge`), and then assign any combination of defined classes to any separate element. Code example:
+
+```yaml
+elements:
+    node:
+        fixedsize: true
+        penwidth: 3
+        classes:
+            generic:
+                shape: box
+                width: 4
+                height: 1
+                style: rounded
+            database:
+                shape: cylinder
+                width: 3
+                height: 3
+            external_network:
+                shape: circle
+                width: 2.5
+                height: 2.5
+                style: filled
+                fillcolor: '#f0f0f0'
+```
+
+In this example, 3 classes of nodes with the names `generic`, `database`, and `external_network` are defined. Note that using of classes doesn’t disallow to use global default settings.
+
+##### Grid Settings
+
+To control the relative positions of elements, Archeme provides the ability to describe nodes arrangement as a text  grid. In the `elements` section of common settings you may define the horizontal and vertical intervals of the grid step. Code example:
+
+```yaml
+elements:
+    grid:
+        spacing_x: 400
+        spacing_y: 250
+```
+
+The `spacing_x` parameter sets the horizontal interval and defaults to `500`; the `spacing_y` parameter sets the vertical interval and defaults to `200`. Grid spacing units are *points*; 1 point equals to 1/72 inch.
+
+Note that `neato` and `fdp` engines use different units for the `pos` attribute: points and inches respectively. Archeme takes it into account. If you specify `engine: neato`, do not try to draw the resulting graph description with `fdp`, and vice versa. The `dot` engine doesn’t support positioning at all.
+
+### Scheme Description
+
+**TODO**
+
+### Combining Multiple Schemes
+
+**TODO**
 
 ## Examples
 
-### 1. Foliant Architecture, Simple, Drawn With Neato
+Archeme repository includes [some examples](https://github.com/foliant-docs/archeme/tree/master/examples) of architectural schemes.
+
+Each example is located in its own folder that has the following structure:
+
+* `source/*`—YAML-based DSL sources;
+* `target/*`—generated graph descriptions for Graphviz, resulting PNG images;
+* `draw.sh`—shell script that executes the commands which create target files.
+
+PNG images are shown below.
+
+### 1. Foliant Architecture, Simple, Drawn With `neato`
 
 ![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/01_foliant_architecture_simple/target/architecture.png)
 
-### 2. Foliant Architecture, Pretty, Drawn With Neato
+### 2. Foliant Architecture, Pretty, Drawn With `neato`
 
 ![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/02_foliant_architecture_pretty/target/architecture.png)
 
-### 3. Foliant Architecture, With A Cluster, Drawn With Fdp
+### 3. Foliant Architecture, With A Cluster, Drawn With `fdp`
 
 ![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/03_foliant_architecture_with_cluster/target/architecture.png)
 
-### 4. Foliant Architecture, With More Clusters, Drawn With Fdp
+### 4. Foliant Architecture, With More Clusters, Drawn With `fdp`
 
 ![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/04_foliant_architecture_more_clusters/target/architecture.png)
 
-### 5. Foliant Architecture, With Many Nested Clusters, Drawn With Dot
+### 5. Foliant Architecture, With Many Nested Clusters, Drawn With `dot`
 
 ![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/05_foliant_architecture_many_nested_clusters/target/architecture.png)
 
-### 6. Digital Television System, Two Subsystems, Two Styles, Drawn With Dot
+### 6. Digital Television System, Two Subsystems, Two Styles, Drawn With `dot`
 
 #### Style 1
 
