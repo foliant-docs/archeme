@@ -195,7 +195,189 @@ Note that `neato` and `fdp` engines use different units for the `pos` attribute:
 
 ### Scheme Description
 
-**TODO**
+To describe a scheme or a diagram, it’s needed to:
+
+* specify scheme structure—define nodes and clusters;
+* specify relations between nodes—define edges;
+* control the relative positions of nodes:
+    * define a text grid, if the `neato` or `fdp` engine is used;
+    * specify which nodes should have the same rank, if the `dot` engine is used.
+
+#### Structure
+
+To define nodes and clusters, Archeme DSL provides the `structure` section. You may assign Graphviz attributes and Archeme classes to any node and any cluster. For nodes, the `id` parameter is only required. All other parameters are optional. The `id` parameter is used to assign a text identifier to a certain node.
+
+Simple code example:
+
+```yaml
+structure:
+    - node:
+        id: first
+    - node:
+        id: second
+```
+
+In this example, 2 nodes with the identifiers `first` and `second` are defined.
+
+Note that the value of the `structure` parameter must be a list. If the `dot` engine is used, the order of nodes matters for their positioning. If the `neato` or `fdp` engine is used, the order of nodes doesn’t matter.
+
+Clusters should be specified at the same level as nodes. Each cluster has nested `structure` that may include nodes and nested clusters. Code example:
+
+```yaml
+structure:
+    - node:
+        id: first
+    - node:
+        id: second
+    - cluster:
+        structure:
+            - node:
+                id: third
+            - node:
+                id: fourth
+```
+
+The following code example shows how it’s possible to assign Graphviz attributes and Archeme classes to nodes and clusters:
+
+```yaml
+structure:
+    - node:
+        id: first
+        label: The First Node
+        class:
+            - amazing
+            - awesome
+    - cluster:
+        label: The Wonderful Cluster
+        style: filled
+        fillcolor: '#cccccc'
+        class: wonderful
+        structure:
+            ...
+```
+
+Single class name may be specified as a string, multiple class names should be specified as a list.
+
+Archeme merges attributes of classes. Suppose 2 classes are defined as the following:
+
+```yaml
+classes:
+    amazing:
+        shape: box
+        width: 4
+        height: 1
+        style:
+            - rounded
+            - filled
+    awesome:
+        height: 2
+        style:
+            - dashed
+        fillcolor: '#99ccff'
+```
+
+If both styles are assigned to some node in the order: `[amazing, awesome]`, the resulting attributes assigned to the node will be:
+
+```yaml
+shape: box
+width: 4
+height: 2
+style:
+    - rounded
+    - filled
+    - dashed
+fillcolor: '#99ccff'
+```
+
+So, the `style` attributes will be combined. Contradicting values of the attributes of the same names will be taken from the last class in the sequence (like `height` in this example).
+
+#### Relations
+
+To show relations between nodes, edges are used. To define a list of edges, use the `edges` section. Simple code example:
+
+```yaml
+edges:
+    -   tail: first
+        head: second
+    -   tail: second
+        head: third
+```
+
+In this example, 2 edges are defined. These edges specify relations between 3 nodes with the identifiers `first`, `second`, and `third`.
+
+Archeme uses directed graphs only. So each edge should have a tail (“source,” “beginning”) and a head (“target,” “ending”). For example, if an edge represents interaction between a client and a server, it will be alright if a tail will be assigned to a client, and a head—to a server. However, client requests and server responses may be shown as two different counter-directed edges.
+
+You may assign Graphviz attributes and classes to edges like in case with nodes and clusters. Example:
+
+```yaml
+edges:
+    -   tail: first
+        head: second
+        label: HTTP API
+        class: two_arrows
+```
+
+Archeme provides extended syntax for the `label` and `xlabel` attributes of edges. You may specify protocol and describe transferred data:
+
+```yaml
+    -   tail: first
+        head: second
+        label:
+            protocol: HTTP
+            data: Admin API
+```
+
+This code will be transformed into the following construction in a graph description:
+
+```
+"first" -> "second" [label = <<b>HTTP</b><br />Admin API>];
+```
+
+#### Positioning
+
+Archeme implements a powerful concept to control relative positions of scheme elements. Positioning may be described as a multiline text grid. Suppose you have 10 nodes with the identifiers from `first` to `tenth`. Feel free to set their positions in this visual way:
+
+```yaml
+grid: |
+    -        -    second    sixth
+    first         third
+                  fourth               eighth
+                                       ninth
+                  fifth     seventh
+                                       -
+                                       tenth
+```
+
+If the engine `neato` or `fdp` is used, the nodes will be strictly positioned with the `pos` attribute. Positions will be calculated using the values of the `elements.grid.spacing_x` and `elements.grid.spacing_y` parameters. A hyphen (`-`) means skipped step if it’s necessary not to place any nodes to the the respective horizontal or vertical coordinate.
+
+Grid steps are defined by start positions of node identifiers. So, the nodes `second`, `third`, `fourth`, and `fifth` from the example will be placed to the third horizontal step of the grid.
+
+The `dot` engine ignores the `pos` attribute, but it allows to place nodes with the same rank to the same hierarchy level of the resulting layout. If the `dot` engine is used, Archeme analyzes a grid and defines groups (subgraphs) of nodes with the same ranks. For the example above and the `elements.graph.rankdir` attribute set to `LR` (left to right), Archeme will generate the following groups:
+
+* `second`, `third`, `fourth`, `fifth`;
+* `sixth`, `seventh`;
+* `eighth`, `ninth`, `tenth`.
+
+If the `elements.graph.rankdir` attribute is set to `TB` (top to bottom), for the example above Archeme will make the following groups:
+
+* `second`, `sixth`;
+* `first`, `third`;
+* `fourth`, `eighth`;
+* `fifth`, `seventh`.
+
+If you don’t plan to use the engines `neato` and `fdp` to draw a certain scheme, and use only `dot`, you don’t need to describe grids. For `dot`, instead of using grids, you may define groups of nodes of the same ranks explicitly. Example of code that represents the last described case:
+
+```yaml
+groups:
+    -   - second
+        - sixth
+    -   - first
+        - third
+    -   - fourth
+        - eighth
+    -   - fifth
+        - seventh
+```
 
 ### Combining Multiple Schemes
 
