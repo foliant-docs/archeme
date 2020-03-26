@@ -519,3 +519,5 @@ PNG images drawn with Graphviz are shown below.
 ##### Whole System, Reuses Subsystems Descriptions
 
 ![](https://raw.githubusercontent.com/foliant-docs/archeme/master/examples/06_digital_tv_architecture/target/style_2/combined.png)
+
+Clouds and client devices icons are made by [iconixar](https://www.flaticon.com/authors/iconixar/).
