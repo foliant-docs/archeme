@@ -363,13 +363,18 @@ class MergeMultipleSchemes(object):
 
             if module_params:
                 module_id: str = module_params.get('id', '')
-                module_file_path_str: str = module_params.get('file', '')
 
-                if module_id and module_file_path_str:
-                    module_file_path: Path = Path(module_file_path_str).resolve()
+                if module_id:
+                    module: dict = module_params.get('description', {})
 
-                    with open(module_file_path) as module_file:
-                        module: dict = load(module_file, Loader)
+                    if not module:
+                        module_file_path_str: str = module_params.get('file', '')
+
+                        if module_file_path_str:
+                            module_file_path: Path = Path(module_file_path_str).resolve()
+
+                            with open(module_file_path) as module_file:
+                                module = load(module_file, Loader)
 
                     module = self._update_module(module_id, module, module_params.get('exclude', []))
 

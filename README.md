@@ -59,6 +59,8 @@ The command takes 2 mandatory arguments: `-i`/`--input` for input YAML-based DSL
 
 ## YAML-Based DSL
 
+* See also: [Archeme DSL Quick Reference](https://github.com/foliant-docs/archeme/blob/master/dsl_reference.md)
+
 To describe schemes and diagrams, YAML-based DSL is provided.
 
 DSL, same as Graphviz, operates the graph theory terms: so, *graph* is the whole drawing; *node* is a functional component of a scheme or a diagram; *cluster* is a group of nodes that is usually highlighted visually; *edge* is a line that represents a relation between two nodes.
@@ -387,7 +389,7 @@ A module is a scheme description that is used as a part of the structure of the 
 
 Each module should have an identifier. To avoid conflicts when some nodes have the same identifiers in different modules, node identifiers are combined with module identifiers in the resulting scheme description. For example, the node `api` from the module `backend` will get the identifier `backend.api` in the resulting combined scheme description.
 
-Currently Archeme works with modules that are described in separate files. To include some module into the resulting scheme structure, you should specify module identifier and module description file. Code example:
+Archeme works with modules that are described in separate files. To include some module into the resulting scheme structure, you should specify module identifier and module description file. Code example:
 
 ```yaml
 structure:
@@ -398,6 +400,8 @@ structure:
         id: frontend
         file: path/to/frontend.yml
 ```
+
+It seems most convenient to describe modules in separate files, if Archeme is used as a stand-alone command-line tool. However, Archeme allows to specify a module description directly as a value of the `description` parameter that should be used instead of the `file` parameter. This way may be preferred when Archeme is used as a Python package in a third-party application.
 
 In this example, 2 modules with the identifiers `backend` and `frontend` are added to the resulting structure.
 
