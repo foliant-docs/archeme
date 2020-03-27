@@ -13,7 +13,7 @@ except FileNotFoundError:
 
 setup(
     name='archeme',
-    version='1.0.0',
+    version='1.0.1',
     url='https://github.com/foliant-docs/archeme',
     download_url='https://pypi.org/project/archeme',
     license='MIT',
