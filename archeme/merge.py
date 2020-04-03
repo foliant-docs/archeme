@@ -36,7 +36,8 @@ class MergeMultipleSchemes(object):
             node_id: str
             for node_id in nodes_lines[line_number]:
                 if node_id == '-':
-                    updated_nodes.append(node_id)
+                    if not node_id in updated_nodes:
+                        updated_nodes.append(node_id)
 
                 elif node_id not in nodes_to_exclude:
                     updated_nodes.append(f'{module_id}.{node_id}')
@@ -46,6 +47,7 @@ class MergeMultipleSchemes(object):
         updated_nodes_starts: dict = {}
         module_id_length = len(module_id)
 
+        index: int
         position: int
         for index, position in enumerate(sorted(nodes_starts.keys())):
             updated_nodes: list = []
@@ -53,7 +55,8 @@ class MergeMultipleSchemes(object):
             node_id: str
             for node_id in nodes_starts[position]:
                 if node_id == '-':
-                    updated_nodes.append(node_id)
+                    if not node_id in updated_nodes:
+                        updated_nodes.append(node_id)
 
                 elif node_id not in nodes_to_exclude:
                     updated_nodes.append(f'{module_id}.{node_id}')
@@ -68,10 +71,18 @@ class MergeMultipleSchemes(object):
 
             position: int
             for position in sorted(updated_nodes_starts.keys()):
+                updated_node_id: str = ''
+
                 node_id: str
                 for node_id in updated_nodes_lines[line_number]:
-                    if node_id in updated_nodes_starts[position]:
-                        updated_grid_line += ' ' * (position - len(updated_grid_line)) + node_id
+                    if node_id != '-' and node_id in updated_nodes_starts[position]:
+                        updated_node_id = node_id
+                        break
+
+                if not updated_node_id:
+                    updated_node_id = '-'
+
+                updated_grid_line += ' ' * (position - len(updated_grid_line)) + updated_node_id
 
             updated_grid += updated_grid_line + '\n'
 
@@ -241,7 +252,11 @@ class MergeMultipleSchemes(object):
 
         scheme_column_position: int
         for scheme_column_position in sorted(scheme_elements_starts.keys(), reverse=True):
-            if set(scheme_elements_starts[scheme_column_position]).intersection(modules_grids.keys()):
+            modules_in_column: set = set(
+                scheme_elements_starts[scheme_column_position]
+            ).intersection(modules_grids.keys())
+
+            if modules_in_column:
                 position_to_update: int
                 for position_to_update in sorted(scheme_elements_starts.keys(), reverse=True):
                     if position_to_update == scheme_column_position:
@@ -252,7 +267,7 @@ class MergeMultipleSchemes(object):
                         scheme_line_number: int
                         for scheme_line_number in sorted(scheme_elements_lines.keys(), reverse=True):
                             module_id: str = ''
-                            possible_module_id: set = set(scheme_elements_starts[scheme_column_position]).intersection(
+                            possible_module_id: set = modules_in_column.intersection(
                                 scheme_elements_lines[scheme_line_number]
                             )
 
@@ -342,10 +357,18 @@ class MergeMultipleSchemes(object):
 
             position: int
             for position in sorted(scheme_elements_starts.keys()):
+                updated_node_id: str = ''
+
                 node_id: str
                 for node_id in scheme_elements_lines[updated_scheme_line_number]:
-                    if node_id in scheme_elements_starts[position]:
-                        updated_scheme_grid_line += ' ' * (position - len(updated_scheme_grid_line)) + node_id
+                    if node_id != '-' and node_id in scheme_elements_starts[position]:
+                        updated_node_id = node_id
+                        break
+
+                if not updated_node_id:
+                    updated_node_id = '-'
+
+                updated_scheme_grid_line += ' ' * (position - len(updated_scheme_grid_line)) + updated_node_id
 
             updated_scheme_grid += updated_scheme_grid_line + '\n'
 

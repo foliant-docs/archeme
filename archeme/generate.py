@@ -275,7 +275,7 @@ class GenerateGraphvizSource():
                 for node in nodes_starts[node_start]:
                     node_position_y: int or float = -node['line'] * spacing_y
 
-                    if nodes.get('nodes', {}).get(node['id'], None):
+                    if nodes.get('nodes', {}).get(node['id'], None) is not None:
                         if not nodes['nodes'][node['id']].get('pos', None):
                             if isinstance(node_position_x, float):
                                 node_position_x = float('{0:.2f}'.format(node_position_x))
