@@ -1,5 +1,4 @@
 import re
-from yaml import load, Loader
 from pathlib import Path
 from collections import OrderedDict
 
